@@ -1,0 +1,49 @@
+
+.question-item{
+    width: 770px;
+    min-height: 150px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    background: #fff;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    width: 770px;
+    border-radius: 6px;
+    border-top: 9px solid #673AB7;
+    border-left: 5px solid #4285F4;
+
+
+    .question-row{
+        display: flex;
+        flex-direction: column;
+        position: relative;
+       .question-text{
+        width: 300px;
+         margin-left: 20px;
+          border: none;
+          outline: none;
+          padding: 8px 0;
+          font-size: 16px;
+          background: transparent;
+          border-bottom: 1px solid #dadce0;
+          margin-bottom: 30px;
+       }
+
+       select{
+        position: absolute;
+            width: 250px;
+            height: 50px;
+            right: 20px;
+            top: 10px;
+       }
+
+       .remove-btn{
+        position: absolute;
+        width: 70px;
+        height: 40px;
+        right: 10px;
+        top: 100px;
+       }
+    }
+}

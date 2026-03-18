@@ -36,7 +36,9 @@ const QuestionType = new GraphQLObjectType({
 const ResponseType = new GraphQLObjectType({
   name: 'Response',
   fields: () => ({
+    id: { type: GraphQLID },                     // added
     formId: { type: GraphQLID },
+    submittedAt: { type: GraphQLString },        // added
     answers: { type: new GraphQLList(AnswerType) }
   })
 });
@@ -65,7 +67,7 @@ const AnswerInputType = new GraphQLInputObjectType({
   name: 'AnswerInput',
   fields: () => ({
     questionId: { type: new GraphQLNonNull(GraphQLID) },
-    value: { type: new GraphQLNonNull(GraphQLString) }
+     value: { type: GraphQLString }
   })
 });
 
@@ -119,7 +121,12 @@ const RootMutation = new GraphQLObjectType({
         answers: { type: new GraphQLList(AnswerInputType) }
       },
       resolve: (_, { formId, answers }) => {
-        const response = { formId, answers };
+        const response = {
+          id: (responses.length + 1).toString(),
+          formId,
+          submittedAt: new Date().toISOString(),
+          answers
+        };
         responses.push(response);
         return response;
       }
