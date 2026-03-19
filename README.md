@@ -29,8 +29,8 @@
    - Встановити залежності: у корені проекту: ```npm install```
      
    Backend: 
+   
    ```cd server```
-    
     ```npm install```
      
    Frontend: 
