@@ -23,16 +23,18 @@
   - concurrently — паралельний запуск клієнта й сервера однією командою
 
  Інструкція по запуску: 
-  Клонування репозиторію: git clone https://github.com/fushigura/GoogleFroms.git
+ 
+  Клонування репозиторію: ```git clone https://github.com/fushigura/GoogleFroms.git```
   
-   - Встановити залежності: у корені проекту: npm install
+   - Встановити залежності: у корені проекту: ```npm install```
      
    Backend: 
-   - cd server
-   - npm install
+   ```cd server```
+    
+    ```npm install```
      
    Frontend: 
-    - cd ../client/client 
-    - npm install
+     ```cd ../client/client ```
+     ```npm install```
    
-Запуск сервера та клієнта в корені проекту: npm run dev
+Запуск сервера та клієнта в корені проекту: ```npm run dev```
