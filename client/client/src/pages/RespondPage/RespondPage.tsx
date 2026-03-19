@@ -1,3 +1,4 @@
+import "./RespondPage.scss"
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { gql } from '@apollo/client';
@@ -78,10 +79,8 @@ export default function RespondPage() {
     setLoading(true);
     setError(null);
     try {
-      // map answers object -> AnswerInput[]
       const answersInput = Object.entries(answers).map(([qid, v]) => ({
         questionId: qid,
-        // server expects string; stringify arrays/objects
         value: typeof v === 'string' ? v : JSON.stringify(v)
       }));
 
@@ -105,59 +104,85 @@ export default function RespondPage() {
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <Link to={`/form/${form.id}`}>Back</Link>
-      <h2>{form.title}</h2>
-      <p>{form.description}</p>
+    <>
+      <header>
+        <div className="form-title">
+          <Link to="/"><img src="./img/logo.png" width={40} height={40} alt="" /></Link>
+          <div>Respond</div>
+        </div>
+      </header>
 
-      {form.questions.map((q, idx) => {
-        const qid = q.id ?? `q-${idx}`;
-        const value = answers[qid];
+      <section className="form-section">
+        <div className="form-container">
+          <div className="content">
+            <div className="form-header-container">
+              <div className="form-header">
+                <div className="respond-body">
+                  <h2>{form.title}</h2>
+                  <p>{form.description}</p>
 
-        return (
-          <div key={qid} style={{ marginBottom: 12 }}>
-            <div style={{ fontWeight: 600 }}>{`${idx + 1}. ${q.text}`}</div>
+                  {form.questions.map((q, idx) => {
+                    const qid = q.id ?? `q-${idx}`;
+                    const value = answers[qid];
 
-            {q.type === 'TEXT' && (
-              <input type="text" value={value ?? ''} onChange={e => handleChange(qid, e.target.value)} />
-            )}
+                    return (
+                      <div key={qid} className="respond-question">
+                        <div className="q-title">{`${idx + 1}. ${q.text}`}</div>
 
-            {q.type === 'DATE' && (
-              <input type="date" value={value ?? ''} onChange={e => handleChange(qid, e.target.value)} />
-            )}
+                        {q.type === 'TEXT' && (
+                          <input type="text" value={value ?? ''} onChange={e => handleChange(qid, e.target.value)} />
+                        )}
 
-            {q.type === 'MULTIPLE_CHOICE' && (q.options ?? []).map((opt, oi) => (
-              <label key={oi} style={{ display: 'block' }}>
-                <input
-                  type="radio"
-                  name={qid}
-                  checked={value === opt}
-                  onChange={() => handleChange(qid, opt)}
-                /> {opt}
-              </label>
-            ))}
+                        {q.type === 'DATE' && (
+                          <input type="date" value={value ?? ''} onChange={e => handleChange(qid, e.target.value)} />
+                        )}
 
-            {q.type === 'CHECKBOX' && (q.options ?? []).map((opt, oi) => {
-              const arr: string[] = Array.isArray(value) ? value : [];
-              const checked = arr.includes(opt);
-              return (
-                <label key={oi} style={{ display: 'block' }}>
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={() => {
-                      const next = checked ? arr.filter(a => a !== opt) : [...arr, opt];
-                      handleChange(qid, next);
-                    }}
-                  /> {opt}
-                </label>
-              );
-            })}
+                        {q.type === 'MULTIPLE_CHOICE' && (q.options ?? []).map((opt, oi) => (
+                          <label key={oi} style={{ display: 'block' }}>
+                            <input
+                              type="radio"
+                              name={qid}
+                              checked={value === opt}
+                              onChange={() => handleChange(qid, opt)}
+                            /> {opt}
+                          </label>
+                        ))}
+
+                        {q.type === 'CHECKBOX' && (q.options ?? []).map((opt, oi) => {
+                          const arr: string[] = Array.isArray(value) ? value : [];
+                          const checked = arr.includes(opt);
+                          return (
+                            <label key={oi} style={{ display: 'block' }}>
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={() => {
+                                  const next = checked ? arr.filter(a => a !== opt) : [...arr, opt];
+                                  handleChange(qid, next);
+                                }}
+                              /> {opt}
+                            </label>
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="form-menu">
+                <div className="add-btn" />
+                <div className="menu-actions">
+                  <button className="menu-btn" onClick={handleSubmit} disabled={loading}>
+                    {loading ? 'Submitting...' : 'Submit'}
+                  </button>
+                  <button className="menu-btn secondary" onClick={() => navigate(`/form/${form.id}`)}>Back</button>
+                </div>
+              </div>
+            </div>
           </div>
-        );
-      })}
-
-      <button onClick={handleSubmit}>Submit answers</button>
-    </div>
+        </div>
+      </section>
+    </>
   );
 }

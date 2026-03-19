@@ -59,16 +59,13 @@ export default function HomePage() {
     fetchForms()
   }, [fetchForms])
 
-  // quick create: створює форму з дефолтними полями і додає у список
   const handleQuickCreate = async () => {
     setError(null)
     setLoading(true)
     try {
       const created = await apiCreateForm('Нова форма', '', [])
       if (created) {
-        // додати в локальний стан для миттєвого відображення
         setForms(prev => [created, ...prev])
-        // перейти на сторінку редагування (можна змінити на відкриття)
         navigate(`/form/${created.id}/edit`)
       } else {
         setError('Не вдалося створити форму')

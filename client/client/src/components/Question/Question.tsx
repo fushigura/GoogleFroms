@@ -33,7 +33,6 @@ export default function QuestionComponent({
 
   const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const type = e.target.value as QuestionType;
-    // якщо тип потребує options — ініціалізуємо, інакше прибираємо
     if (type === 'MULTIPLE_CHOICE' || type === 'CHECKBOX') {
       onChange(index, { type, options: question.options && question.options.length ? question.options : [''] });
     } else {

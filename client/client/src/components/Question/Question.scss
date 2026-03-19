@@ -1,49 +1,108 @@
 
 .question-item{
-    width: 770px;
-    min-height: 150px;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-    background: #fff;
-    margin-bottom: 15px;
+  width: 770px;
+  min-height: 150px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  background: #fff;
+  margin: 10px 0 15px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 6px;
+  border-left: 5px solid #4285F4;
+  border-top: 6px solid #673AB7;
+  padding: 16px 20px 14px 20px;
+
+  .question-row{
+    display: grid;
+    grid-template-columns: 1fr 220px auto;
+    gap: 12px;
+    align-items: start;
+
+    .question-text{
+      width: 100%;
+      border: none;
+      outline: none;
+      padding: 8px 0;
+      font-size: 16px;
+      background: transparent;
+      border-bottom: 1px solid #dadce0;
+    }
+
+    select{
+      width: 100%;
+      height: 40px;
+      border-radius: 6px;
+      border: 1px solid #dadce0;
+      background: #fff;
+      padding: 0 10px;
+      outline: none;
+    }
+
+    .remove-btn{
+      height: 40px;
+      padding: 0 12px;
+      border-radius: 6px;
+      border: 1px solid #dadce0;
+      background: #fff;
+      cursor: pointer;
+    }
+  }
+
+  .answer-preview{
+    margin-top: 12px;
+    input{
+      width: 100%;
+      max-width: 420px;
+    }
+  }
+
+  .options{
+    margin-top: 12px;
     display: flex;
     flex-direction: column;
-    margin-top: 10px;
-    width: 770px;
-    border-radius: 6px;
-    border-top: 9px solid #673AB7;
-    border-left: 5px solid #4285F4;
+    gap: 10px;
 
+    .option-row{
+      display: grid;
+      grid-template-columns: 18px 1fr auto;
+      gap: 10px;
+      align-items: center;
 
-    .question-row{
-        display: flex;
-        flex-direction: column;
-        position: relative;
-       .question-text{
-        width: 300px;
-         margin-left: 20px;
-          border: none;
-          outline: none;
-          padding: 8px 0;
-          font-size: 16px;
-          background: transparent;
-          border-bottom: 1px solid #dadce0;
-          margin-bottom: 30px;
-       }
+      input[type="radio"],
+      input[type="checkbox"]{
+        margin: 0;
+      }
 
-       select{
-        position: absolute;
-            width: 250px;
-            height: 50px;
-            right: 20px;
-            top: 10px;
-       }
+      .option-input{
+        width: 100%;
+        border: none;
+        outline: none;
+        padding: 8px 0;
+        font-size: 14px;
+        background: transparent;
+        border-bottom: 1px solid #dadce0;
+      }
 
-       .remove-btn{
-        position: absolute;
-        width: 70px;
-        height: 40px;
-        right: 10px;
-        top: 100px;
-       }
+      button{
+        height: 32px;
+        width: 32px;
+        border-radius: 6px;
+        border: 1px solid #dadce0;
+        background: #fff;
+        cursor: pointer;
+      }
     }
+
+    > button{
+      align-self: flex-start;
+      height: 36px;
+      padding: 0 12px;
+      border-radius: 6px;
+      border: none;
+      background: #7438D2;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    }
+  }
 }

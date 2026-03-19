@@ -1,10 +1,8 @@
 import { GraphQLObjectType, GraphQLSchema, GraphQLString, GraphQLID, GraphQLList, GraphQLInputObjectType, GraphQLNonNull, GraphQLEnumType } from 'graphql';
 
-// In-memory storage
 const forms: any[] = [];
 const responses: any[] = [];
 
-// Типи GraphQL
 const QuestionTypeEnum = new GraphQLEnumType({
   name: 'QuestionType',
   values: {
@@ -29,16 +27,16 @@ const QuestionType = new GraphQLObjectType({
     id: { type: GraphQLID },
     type: { type: QuestionTypeEnum },
     text: { type: GraphQLString },
-    options: { type: new GraphQLList(GraphQLString) } // для MULTIPLE_CHOICE/ CHECKBOX
+    options: { type: new GraphQLList(GraphQLString) }
   })
 });
 
 const ResponseType = new GraphQLObjectType({
   name: 'Response',
   fields: () => ({
-    id: { type: GraphQLID },                     // added
+    id: { type: GraphQLID },
     formId: { type: GraphQLID },
-    submittedAt: { type: GraphQLString },        // added
+    submittedAt: { type: GraphQLString },
     answers: { type: new GraphQLList(AnswerType) }
   })
 });
@@ -53,7 +51,6 @@ const FormType = new GraphQLObjectType({
   })
 });
 
-// Input типи для мутацій
 const QuestionInputType = new GraphQLInputObjectType({
   name: 'QuestionInput',
   fields: () => ({
@@ -71,7 +68,6 @@ const AnswerInputType = new GraphQLInputObjectType({
   })
 });
 
-// Root Query
 const RootQuery = new GraphQLObjectType({
   name: 'Query',
   fields: {
@@ -92,7 +88,6 @@ const RootQuery = new GraphQLObjectType({
   }
 });
 
-// Root Mutation
 const RootMutation = new GraphQLObjectType({
   name: 'Mutation',
   fields: {
@@ -104,6 +99,9 @@ const RootMutation = new GraphQLObjectType({
         questions: { type: new GraphQLList(QuestionInputType) }
       },
       resolve: (_: any, { title, description, questions }: { title: string; description?: string; questions?: any[] }) => {
+        if (!title || !title.trim()) {
+          throw new Error('Title is required');
+        }
         const form = {
           id: (forms.length + 1).toString(),
           title,
@@ -112,6 +110,36 @@ const RootMutation = new GraphQLObjectType({
         };
         forms.push(form);
         return form;
+      }
+    },
+    updateForm: {
+      type: FormType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLID) },
+        title: { type: new GraphQLNonNull(GraphQLString) },
+        description: { type: GraphQLString },
+        questions: { type: new GraphQLList(QuestionInputType) }
+      },
+      resolve: (_: any, { id, title, description, questions }: { id: string; title: string; description?: string; questions?: any[] }) => {
+        if (!title || !title.trim()) {
+          throw new Error('Title is required');
+        }
+
+        const existingIndex = forms.findIndex(f => f.id === id);
+        if (existingIndex < 0) {
+          throw new Error('Form not found');
+        }
+
+        const updated = {
+          ...forms[existingIndex],
+          id,
+          title,
+          description,
+          questions: (questions ?? []).map((q, idx) => ({ ...(q as any), id: (idx + 1).toString() }))
+        };
+
+        forms[existingIndex] = updated;
+        return updated;
       }
     },
     submitResponse: {

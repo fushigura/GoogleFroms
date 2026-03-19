@@ -10,7 +10,7 @@ export default function Header() {
             </div>
 
             <div className="search">
-            <img src="" alt="" />
+            <img src="./img/icons/plus.png" alt="" width={20} height={20} />
             <input type="text" placeholder="Search"/>
             </div>
         

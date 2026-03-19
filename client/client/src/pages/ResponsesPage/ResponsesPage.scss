@@ -1,0 +1,24 @@
+@import "../../styles/FormShell.scss";
+
+.responses-body {
+  padding: 18px 20px 24px 20px;
+}
+
+.responses-body h2 {
+  margin: 0 0 14px 0;
+  font-size: 22px;
+}
+
+.response-card {
+  border: 1px solid #ddd;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.response-meta {
+  font-size: 12px;
+  color: #666;
+}
+

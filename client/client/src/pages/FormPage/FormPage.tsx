@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams, useLocation } from "react-router-dom"
 import { useCallback, useEffect, useState } from "react"
 import QuestionComponent from '../../components/Question/Question';
 import type { Question as QuestionType } from '../../components/Question/Question';
-import { createForm as apiCreateForm } from './formApi'; // <-- імпорт API
+import { createForm as apiCreateForm, updateForm as apiUpdateForm } from './formApi';
 import { gql } from "@apollo/client";
 import { client } from '../../graphql/client';
 
@@ -74,7 +74,6 @@ export default function FormPage() {
     if (id) {
       fetchForm(id)
     } else {
-      // new form reset
       setTitle("Untitled Form")
       setDescription("")
       setQuestions([])
@@ -116,9 +115,26 @@ export default function FormPage() {
     setQuestions(prev => prev.filter((_, i) => i !== index))
   }
 
-  // create new form
+  const validate = () => {
+    if (!title.trim()) return 'Title is required'
+    for (let i = 0; i < questions.length; i++) {
+      const q = questions[i]
+      if (!q.text?.trim()) return `Question ${i + 1}: text is required`
+      if ((q.type === 'MULTIPLE_CHOICE' || q.type === 'CHECKBOX')) {
+        const opts = (q.options ?? []).map(o => (o ?? '').trim()).filter(Boolean)
+        if (opts.length < 2) return `Question ${i + 1}: add at least 2 options`
+      }
+    }
+    return null
+  }
+
   const handleCreate = async () => {
     setError(null)
+    const v = validate()
+    if (v) {
+      setError(v)
+      return
+    }
     setLoading(true)
     try {
       const questionsInput = questions.map(q => ({
@@ -139,19 +155,27 @@ export default function FormPage() {
     }
   }
 
-  // save edits — server update mutation not implemented in backend; fallback: create new form and navigate home
   const handleSave = async () => {
     setError(null)
+    const v = validate()
+    if (v) {
+      setError(v)
+      return
+    }
     setLoading(true)
     try {
-      // if you implement updateForm on server, replace this with update call
       const questionsInput = questions.map(q => ({
         type: q.type,
         text: q.text,
         options: q.options && q.options.length ? q.options : undefined
       }))
-      const created = await apiCreateForm(title, description, questionsInput)
-      if (created) {
+      if (!id) {
+        setError('Missing form id')
+        return
+      }
+
+      const updated = await apiUpdateForm(id, title, description, questionsInput)
+      if (updated) {
         navigate('/')
       } else {
         setError('Не вдалося зберегти форму')
@@ -163,7 +187,6 @@ export default function FormPage() {
     }
   }
 
-  // readonly preview renderer for view/respond mode
   const renderPreview = (q: QuestionType, idx: number) => {
     if (q.type === 'TEXT') return <input type="text" disabled placeholder="Short answer" />
     if (q.type === 'DATE') return <input type="date" disabled />
@@ -213,7 +236,7 @@ export default function FormPage() {
 
               <div className="form-menu">
                 <div className="add-btn">
-                   {(!isView || isEdit) && (
+                  {(!isView || isEdit) && (
                     <img
                       src="./img/icons/add.png"
                       width={24}
@@ -225,12 +248,24 @@ export default function FormPage() {
                   )}
                 </div>
 
-               <div style={{ marginLeft: 12 }}>
-                  {!id && <button className="create-form-btn" onClick={handleCreate} disabled={loading}>{loading ? 'Creating...' : 'Create Form'}</button>}
-                  {id && isEdit && <button className="create-form-btn" onClick={handleSave} disabled={loading}>{loading ? 'Saving...' : 'Save'}</button>}
-                  {id && isView && <button onClick={() => navigate(`/form/${id}/edit`)}>Edit</button>}
-                 {id && isView && <button onClick={() => navigate(`/form/${id}/respond`)} style={{ marginLeft: 8 }}>Respond</button>}
-                 {id && isView && <button onClick={() => navigate(`/form/${id}/responses`)} style={{ marginLeft: 8 }}>Responses</button>}
+                <div className="menu-actions">
+                  {!id && (
+                    <button className="menu-btn" onClick={handleCreate} disabled={loading}>
+                      {loading ? 'Creating...' : 'Create'}
+                    </button>
+                  )}
+                  {id && isEdit && (
+                    <button className="menu-btn" onClick={handleSave} disabled={loading}>
+                      {loading ? 'Saving...' : 'Save'}
+                    </button>
+                  )}
+                  {id && isView && (
+                    <>
+                      <button className="menu-btn" onClick={() => navigate(`/form/${id}/edit`)}>Edit</button>
+                      <button className="menu-btn" onClick={() => navigate(`/form/${id}/respond`)}>Respond</button>
+                      <button className="menu-btn" onClick={() => navigate(`/form/${id}/responses`)}>Responses</button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

@@ -1,5 +1,6 @@
+import "./ResponsesPage.scss"
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { gql } from "@apollo/client";
 import { client } from "../../graphql/client";
 
@@ -21,6 +22,7 @@ const GET_RESPONSES = gql`
 
 export default function ResponsesPage() {
   const { id } = useParams<{ id?: string }>();
+  const navigate = useNavigate();
   const [responses, setResponses] = useState<ResponseDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,13 +41,9 @@ export default function ResponsesPage() {
           variables: { formId: id },
           fetchPolicy: "network-only",
         });
-        // Якщо сервер повертає errors, Apollo зазвичай викине помилку — але додаткова перевірка не завадить
-        // (res.errors is not standard on successful typed result, тому помилки ловимо в catch)
         setResponses(res.data?.responses ?? []);
       } catch (err: any) {
-        // лог для терміналу / devtools
         console.error("Failed to fetch responses:", err);
-        // якщо це Apollo Error — витягнемо деталі
         const graphQLErrors = err?.graphQLErrors;
         const networkError = err?.networkError;
         if (graphQLErrors && graphQLErrors.length) {
@@ -62,27 +60,52 @@ export default function ResponsesPage() {
   }, [id]);
 
   return (
-    <div style={{ padding: 20 }}>
-      <Link to={`/form/${id}`}>Back to form</Link>
-      <h2>Responses for form {id}</h2>
+    <>
+      <header>
+        <div className="form-title">
+          <Link to="/"><img src="./img/logo.png" width={40} height={40} alt="" /></Link>
+          <div>Responses</div>
+        </div>
+      </header>
 
-      {loading && <div>Loading responses...</div>}
-      {error && <div style={{ color: "red" }}>Error: {error}</div>}
-      {!loading && !error && responses.length === 0 && <div>No responses yet</div>}
+      <section className="form-section">
+        <div className="form-container">
+          <div className="content">
+            <div className="form-header-container">
+              <div className="form-header">
+                <div className="responses-body">
+                  <h2>Responses for form {id}</h2>
 
-      {responses.map((r) => (
-        <div key={r.id} style={{ border: "1px solid #ddd", padding: 12, marginBottom: 12 }}>
-          <div style={{ fontSize: 12, color: "#666" }}>Submitted: {r.submittedAt ?? "—"}</div>
-          <div style={{ marginTop: 8 }}>
-            {r.answers.map((a, i) => (
-              <div key={i} style={{ marginBottom: 6 }}>
-                <strong>{a.questionId ?? `q${i + 1}`}:</strong>{" "}
-                {Array.isArray(a.value) ? a.value.join(", ") : a.value ?? "—"}
+                  {loading && <div>Loading responses...</div>}
+                  {error && <div style={{ color: "red" }}>Error: {error}</div>}
+                  {!loading && !error && responses.length === 0 && <div>No responses yet</div>}
+
+                  {responses.map((r) => (
+                    <div key={r.id} className="response-card">
+                      <div className="response-meta">Submitted: {r.submittedAt ?? "—"}</div>
+                      <div style={{ marginTop: 8 }}>
+                        {r.answers.map((a, i) => (
+                          <div key={i} style={{ marginBottom: 6 }}>
+                            <strong>{a.questionId ?? `q${i + 1}`}:</strong>{" "}
+                            {Array.isArray(a.value) ? a.value.join(", ") : a.value ?? "—"}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
+
+              <div className="form-menu">
+                <div className="add-btn" />
+                <div className="menu-actions">
+                  <button className="menu-btn secondary" onClick={() => navigate(`/form/${id}`)}>Back</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      ))}
-    </div>
+      </section>
+    </>
   );
 }

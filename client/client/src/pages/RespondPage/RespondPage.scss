@@ -1,0 +1,29 @@
+@import "../../styles/FormShell.scss";
+
+.respond-body {
+  padding: 18px 20px 24px 20px;
+}
+
+.respond-body h2 {
+  margin: 0 0 6px 0;
+  font-size: 22px;
+}
+
+.respond-body p {
+  margin: 0 0 14px 0;
+  color: #5f6368;
+}
+
+.respond-question {
+  margin-bottom: 14px;
+}
+
+.respond-question .q-title{
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.respond-actions {
+  padding: 0 20px 18px 20px;
+}
+

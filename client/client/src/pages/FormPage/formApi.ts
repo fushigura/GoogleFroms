@@ -39,9 +39,22 @@ const CREATE_FORM = gql`
   }
 `;
 
-/**
- * Створює форму на сервері і додає її в Apollo cache
- */
+const UPDATE_FORM = gql`
+  mutation UpdateForm($id: ID!, $title: String!, $description: String, $questions: [QuestionInput]) {
+    updateForm(id: $id, title: $title, description: $description, questions: $questions) {
+      id
+      title
+      description
+      questions {
+        id
+        text
+        type
+        options
+      }
+    }
+  }
+`;
+
 export async function createForm(
   title: string,
   description?: string,
@@ -54,10 +67,9 @@ export async function createForm(
       const newForm = data?.createForm;
       if (!newForm) return;
 
-      // Додаємо нову форму в корінний запит "forms"
       cache.modify({
         fields: {
-          forms(existing = []) {
+          forms(existing: any[] = []) {
             const newRef = cache.writeFragment({
               data: newForm,
               fragment: gql`
@@ -74,6 +86,21 @@ export async function createForm(
                 }
               `
             });
+            // avoid duplicates by id
+            const existingIds = existing
+              .map(ref => {
+                try {
+                  return cache.readFragment<{ id: string }>({
+                    id: cache.identify(ref),
+                    fragment: gql`fragment FormId on Form { id }`
+                  })?.id;
+                } catch {
+                  return undefined;
+                }
+              })
+              .filter(Boolean);
+
+            if (existingIds.includes(newForm.id)) return existing;
             return [...existing, newRef];
           }
         }
@@ -82,4 +109,50 @@ export async function createForm(
   });
 
   return result.data?.createForm;
+}
+
+export async function updateForm(
+  id: string,
+  title: string,
+  description?: string,
+  questions?: QuestionInput[]
+): Promise<Form | undefined> {
+  const result = await client.mutate<{ updateForm: Form }, { id: string; title: string; description?: string; questions?: QuestionInput[] }>({
+    mutation: UPDATE_FORM,
+    variables: { id, title, description, questions },
+    update: (cache, { data }) => {
+      const updated = data?.updateForm;
+      if (!updated) return;
+
+      cache.modify({
+        fields: {
+          forms(existing: any[] = [], { readField }) {
+            return existing.map(ref => {
+              const refId = readField<string>('id', ref);
+              if (refId !== updated.id) return ref;
+
+              return cache.writeFragment({
+                data: updated,
+                fragment: gql`
+                  fragment UpdatedForm on Form {
+                    id
+                    title
+                    description
+                    questions {
+                      id
+                      text
+                      type
+                      options
+                    }
+                  }
+                `
+              });
+            });
+          }
+        }
+      });
+    }
+  });
+
+  return result.data?.updateForm;
 }
