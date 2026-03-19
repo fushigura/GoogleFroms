@@ -23,8 +23,14 @@
   - concurrently — паралельний запуск клієнта й сервера однією командою
 
  Інструкція по запуску: 
- -Встановити залежності: у корені проекту: npm install
-   Backend: cd server, npm install
-   Frontend: cd ../client/client,  npm install
+   - Встановити залежності: у корені проекту: npm install
+ 
+   Backend: 
+   - cd server
+   - npm install
+     
+   Frontend: 
+    - cd ../client/client 
+    - npm install
    
 Запуск сервера та клієнта: npm run dev
